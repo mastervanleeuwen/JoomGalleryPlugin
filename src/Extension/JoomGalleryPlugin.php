@@ -179,8 +179,14 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 				$catView = $joomgallery->createView('Category','Site','Html');
 				$catView->setModel($catModel,true);
 				$params = $catView->get('Params');
+
+				// Subcategory params
+				$subcategory_class          = $params['configs']->get('jg_category_view_subcategory_class', 'masonry', 'STRING');
+
+				// Image params
 				$category_class   = $params['configs']->get('jg_category_view_class', 'masonry', 'STRING');;
 				$num_columns      = $params['configs']->get('jg_category_view_num_columns', 6, 'INT');
+				$image_type       = $params['configs']->get('jg_category_view_type_images', 'thumbnail', 'STRING');
 				$caption_align    = $params['configs']->get('jg_category_view_caption_align', 'right', 'STRING');
 				$image_class      = $params['configs']->get('jg_category_view_image_class', '', 'STRING');
 				$justified_height = $params['configs']->get('jg_category_view_justified_height', 320, 'INT');
