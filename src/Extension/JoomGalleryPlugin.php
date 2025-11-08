@@ -235,6 +235,7 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 						$lightbox = true;
 
 						$this->wa->useScript('com_joomgallery.lightgallery');
+						$this->wa->useScript('com_joomgallery.lg-hash');
 						$this->wa->useScript('com_joomgallery.lg-thumbnail');
 						$this->wa->useScript('com_joomgallery.lg-zoom');
 						$this->wa->useStyle('com_joomgallery.lightgallery-bundle');
