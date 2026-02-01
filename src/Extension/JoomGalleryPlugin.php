@@ -179,32 +179,34 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 				$joomgallery = $app->bootComponent('com_joomgallery')->getMVCFactory();
 
 				$catModel = $joomgallery->createModel('Category','site');
-				$catView = $joomgallery->createView('Category','Site','Html');
-				$catView->setModel($catModel,true);
-				$params = $catView->get('Params');
+
+				$catid = (int)$match[1];
+				$catModel->getItem($catid);
+				$catModel->component->createConfig('com_joomgallery.category' , $catid, true);
+				$configs = $catModel->component->getConfig();
 				// Subcategory params
-				$subcategory_class          = $params['configs']->get('jg_category_view_subcategory_class', 'masonry', 'STRING');
+				$subcategory_class          = $configs->get('jg_category_view_subcategory_class', 'masonry', 'STRING');
 
 				// Image params
-				$category_class   = $params['configs']->get('jg_category_view_class', 'masonry', 'STRING');;
-				$num_columns      = $params['configs']->get('jg_category_view_num_columns', 6, 'INT');
-				$image_type       = $params['configs']->get('jg_category_view_type_images', 'thumbnail', 'STRING');
-				$caption_align    = $params['configs']->get('jg_category_view_caption_align', 'right', 'STRING');
-				$image_class      = $params['configs']->get('jg_category_view_image_class', '', 'STRING');
-				$justified_height = $params['configs']->get('jg_category_view_justified_height', 320, 'INT');
-				$justified_gap    = $params['configs']->get('jg_category_view_justified_gap', 5, 'INT');
-				$show_title       = $params['configs']->get('jg_category_view_images_show_title', 0, 'INT');
-				$use_pagination   = $params['configs']->get('jg_category_view_pagination', 0, 'INT');
-				$reloaded_images  = $params['configs']->get('jg_category_view_number_of_reloaded_images', 3, 'INT');
-				$image_link       = $params['configs']->get('jg_category_view_image_link', 'defaultview', 'STRING');
-				$title_link       = $params['configs']->get('jg_category_view_title_link', 'defaultview', 'STRING');
-				$lightbox_image   = $params['configs']->get('jg_category_view_lightbox_image', 'detail', 'STRING');
-				$lightbox_thumbnails = $params['configs']->get('jg_lightbox_thumbnails', 0, 'INT');
-				$lightbox_zoom       = $params['configs']->get('jg_lightbox_zoom', 0, 'INT');
-				$show_description = $params['configs']->get('jg_category_view_show_description', 0, 'INT');
-				$show_imgdate     = $params['configs']->get('jg_category_view_show_imgdate', 0, 'INT');
-				$show_imgauthor   = $params['configs']->get('jg_category_view_show_imgauthor', 0, 'INT');
-				$show_tags        = $params['configs']->get('jg_category_view_show_tags', 0, 'INT');
+				$category_class   = $configs->get('jg_category_view_class', 'masonry', 'STRING');;
+				$num_columns      = $configs->get('jg_category_view_num_columns', 6, 'INT');
+				$image_type       = $configs->get('jg_category_view_type_images', 'thumbnail', 'STRING');
+				$caption_align    = $configs->get('jg_category_view_caption_align', 'right', 'STRING');
+				$image_class      = $configs->get('jg_category_view_image_class', '', 'STRING');
+				$justified_height = $configs->get('jg_category_view_justified_height', 320, 'INT');
+				$justified_gap    = $configs->get('jg_category_view_justified_gap', 5, 'INT');
+				$show_title       = $configs->get('jg_category_view_images_show_title', 0, 'INT');
+				$use_pagination   = $configs->get('jg_category_view_pagination', 0, 'INT');
+				$reloaded_images  = $configs->get('jg_category_view_number_of_reloaded_images', 3, 'INT');
+				$image_link       = $configs->get('jg_category_view_image_link', 'defaultview', 'STRING');
+				$title_link       = $configs->get('jg_category_view_title_link', 'defaultview', 'STRING');
+				$lightbox_image   = $configs->get('jg_category_view_lightbox_image', 'detail', 'STRING');
+				$lightbox_thumbnails = $configs->get('jg_lightbox_thumbnails', 0, 'INT');
+				$lightbox_zoom       = $configs->get('jg_lightbox_zoom', 0, 'INT');
+				$show_description = $configs->get('jg_category_view_show_description', 0, 'INT');
+				$show_imgdate     = $configs->get('jg_category_view_show_imgdate', 0, 'INT');
+				$show_imgauthor   = $configs->get('jg_category_view_show_imgauthor', 0, 'INT');
+				$show_tags        = $configs->get('jg_category_view_show_tags', 0, 'INT');
 
 				$options = explode('|', trim($match[2]));
 				$max_entries = 0;
@@ -213,9 +215,8 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 					if ($opt[0]=='columns') $num_columns=$opt[1];
 					if ($opt[0]=='limit') $max_entries=$opt[1];
 				}
-				$catView->getModel()->getItem($match[1]);
 
-				if (!is_null($catitem = $catView->getModel()->item))
+				if (!is_null($catitem = $catModel->item))
 				{ 
 					// Import CSS & JS
 					if($subcategory_class == 'masonry' || $category_class == 'masonry')
@@ -241,7 +242,11 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 						$this->wa->useStyle('com_joomgallery.lightgallery-bundle');
 					}
 
-					$catimages = $catView->getModel()->getImages();
+					$chache_id = $app->input->getInt('id', null);
+					$app->input->set('id', $catid);
+					$catimages = $catModel->getImages();
+					$app->input->set('id', $cache_id);
+
 					if ($max_entries != 0) $catimages = array_slice($catimages, 0, $max_entries);
 					$numb_images = count($catimages);
 
@@ -263,7 +268,7 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 					$this->wa->useScript('com_joomgallery.joomgrid');
 					$this->wa->addInlineScript($iniJS, ['position' => 'after'], [], ['com_joomgallery.joomgrid']);
 
-					$children = $catView->getModel()->getChildren();
+					$children = $catModel->getChildren($catid);
 					$imgsData = [ 'id' => '1-'.(int) $catitem->id, 'layout' => $category_class, 'items' => $catimages, 'num_columns' => (int) $num_columns,
                   'caption_align' => $caption_align, 'image_class' => $image_class, 'image_type' => $image_type, 'lightbox_type' => $lightbox_image, 'image_link' => $image_link,
                   'image_title' => (bool) $show_title, 'title_link' => $title_link, 'image_desc' => (bool) $show_description, 'image_date' => (bool) $show_imgdate,
@@ -307,6 +312,7 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 		}
 
 		$language = Factory::getApplication()->getLanguage();
+		$language->load('com_joomgallery', JPATH_ADMINISTRATOR . '/components/com_joomgallery');
 		$language->load('com_joomgallery', JPATH_BASE . '/components/com_joomgallery');
 		$language->load('JoomGalleryPlugin', JPATH_BASE . '/plugins/content/joomgallery');
 
