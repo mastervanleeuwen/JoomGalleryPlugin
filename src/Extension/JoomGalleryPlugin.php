@@ -146,8 +146,7 @@ class JoomGalleryPlugin extends CMSPlugin implements SubscriberInterface
 					// TODO: add catlink if requested
 					// NB: joom-image has width:100% which prevents floating; check other classes?
 					$output = "<figure class=\"figure $figclass\">\n";
-					// Try this instead:  Route::_('index.php?option=com_joomgallery&view=image&id='.(int) $match[1])
-					if ($linked) $output .= '<a href="'.JoomHelper::getImg($match[1],'detail').'">';
+					if ($linked) $output .= '<a href="'.JoomHelper::getViewRoute('image', $match[1]).'">';
 					$output .= '<img src="'.$imageurl.'" class="figure-img img-fluid rounded" alt="'.$image->title.'">'."\n";
 					if ($linked) $output .= '</a>';
 					if (strpos($match[2], 'caption')) $output .= '<figcaption class="figure-caption '.$caption_align.'">'."{$image->title}</figcaption>\n";
